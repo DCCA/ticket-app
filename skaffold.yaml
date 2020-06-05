@@ -7,6 +7,9 @@ deploy:
 build:
   local:
     push: false
+  # Add the cloud config
+  # googleCloudBuild:
+  #   projectId: ticket-app-279415
   artifacts:
     - image: dcca/auth
       context: auth
