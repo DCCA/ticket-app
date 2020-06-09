@@ -28,7 +28,6 @@ router.post(
     }
 
     const user = User.build({ email, password });
-    console.log(user);
 
     await user.save();
 
@@ -42,8 +41,10 @@ router.post(
       process.env.JWT_KEY!
     );
 
+    if (req.session !== null) {
+      req.session.jwt = userJwt;
+    }
     // Store on the session obj
-    req.session.jwt = userJwt;
 
     res.status(201).send(user);
   }
