@@ -2,6 +2,7 @@ import express from 'express';
 import 'express-async-errors';
 import { json } from 'body-parser';
 import mongoose from 'mongoose';
+import cookieSession from 'cookie-session';
 
 // Import Routes
 import { currentUserRouter } from './routes/current-user';
@@ -14,7 +15,15 @@ import { NotFoundError } from './errors/not-found-error';
 
 // Start app
 const app = express();
+// Allow the proxy from Ingress
+app.set('trust proxy', true);
 app.use(json());
+app.use(
+  cookieSession({
+    signed: false,
+    secure: true,
+  })
+);
 
 // Register routes
 app.use(currentUserRouter);
@@ -29,6 +38,9 @@ app.get('*', async (req, res, next) => {
 app.use(errorHandler);
 
 const start = async () => {
+  if (!process.env.JWT_KEY) {
+    throw new Error('JWT_TOKEN must be defined');
+  }
   try {
     await mongoose.connect('mongodb://auth-mongo-srv:27017/auth', {
       useNewUrlParser: true,
